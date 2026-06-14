@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎮 Succès Minecraft - Survie Difficile</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #1a1a2e;
+            --bg-card: #16213e;
+            --accent: #e94560;
+            --accent-hover: #ff6b6b;
+            --gold: #ffd700;
+            --silver: #c0c0c0;
+            --bronze: #cd7f32;
+            --success: #4ecca3;
+            --text: #eaeaea;
+            --text-muted: #a0a0a0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #0f0f23 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--bg-card);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--gold), var(--success));
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--accent), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .connection-status {
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .connection-status.online::before {
+            content: '🟢 ';
+        }
+
+        .connection-status.offline::before {
+            content: '🔴 ';
+        }
+
+        /* Navigation tabs */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            box-shadow: 0 5px 20px rgba(233, 69, 96, 0.4);
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Classement des joueurs */
+        .leaderboard {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .leaderboard h2 {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .player-card {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .player-card:hover {
+            background: rgba(255,255,255,0.1);
+            transform: translateX(5px);
+        }
+
+        .rank {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .rank-1 { background: var(--gold); color: #1a1a2e; }
+        .rank-2 { background: var(--silver); color: #1a1a2e; }
+        .rank-3 { background: var(--bronze); color: #1a1a2e; }
+        .rank-other { background: var(--bg-dark); color: var(--text); }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .player-stats {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .player-points {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        .player-points span {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Grille de succès */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .achievement-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .achievement-card.completed {
+            border-color: var(--success);
+        }
+
+        .achievement-card.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .difficulty {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .difficulty.easy { background: #4ecca3; color: #1a1a2e; }
+        .difficulty.medium { background: #ffd700; color: #1a1a2e; }
+        .difficulty.hard { background: #ff6b6b; color: #1a1a2e; }
+        .difficulty.extreme { background: #9b59b6; color: white; }
+
+        .achievement-title {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .achievement-desc {
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+
+        .reward-box {
+            background: rgba(255,215,0,0.1);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .reward-box h4 {
+            color: var(--gold);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .reward-box p {
+            font-size: 0.9rem;
+        }
+
+        .points-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--accent);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Compléter un succès */
+        .complete-btn {
+            margin-top: 15px;
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(90deg, var(--accent), #ff6b6b);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .complete-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .complete-btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal h3 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .modal select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 2px solid var(--accent);
+            background: var(--bg-dark);
+            color: var(--text);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-confirm {
+            background: var(--success);
+            color: #1a1a2e;
+        }
+
+        .btn-cancel {
+            background: var(--text-muted);
+            color: #1a1a2e;
+        }
+
+        .btn-confirm:disabled, .btn-cancel:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Récompenses boutique */
+        .rewards-shop {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .reward-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .reward-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-3px);
+        }
+
+        .reward-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .reward-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        .reward-cost {
+            color: var(--gold);
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .reward-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* Historique */
+        .history-list {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .history-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-icon {
+            width: 45px;
+            height: 45px;
+            background: var(--success);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .history-details {
+            flex: 1;
+        }
+
+        .history-title {
+            font-weight: 600;
+        }
+
+        .history-meta {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .history-points {
+            color: var(--gold);
+            font-weight: bold;
+        }
+
+        .history-reward {
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .history-reward.pending { color: var(--gold); }
+        .history-reward.given { color: var(--success); }
+
+        /* Reset button */
+        .reset-section {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .reset-btn {
+            padding: 10px 30px;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            h1 { font-size: 1.8rem; }
+            .tabs { gap: 5px; }
+            .tab-btn { padding: 10px 15px; font-size: 0.9rem; }
+            .achievements-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Filter */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 20px;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--accent);
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: #1a1a2e;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: 600;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+            max-width: 90%;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: var(--accent);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚔️ Succès Minecraft</h1>
+            <p class="subtitle">Survie Difficile — 5 Joueurs</p>
+            <p class="connection-status offline" id="connectionStatus">Connexion à la base de données...</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="leaderboard">🏆 Classement</button>
+            <button class="tab-btn" data-tab="achievements">📜 Succès</button>
+            <button class="tab-btn" data-tab="rewards">🎁 Récompenses</button>
+            <button class="tab-btn" data-tab="history">📋 Historique</button>
+        </nav>
+
+        <!-- CLASSEMENT -->
+        <section id="leaderboard" class="section active">
+            <div class="leaderboard">
+                <h2>🏆 Classement des joueurs</h2>
+                <div class="player-list" id="playerList"></div>
+            </div>
+        </section>
+
+        <!-- SUCCÈS -->
+        <section id="achievements" class="section">
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">Tous</button>
+                <button class="filter-btn" data-filter="easy">Facile</button>
+                <button class="filter-btn" data-filter="medium">Moyen</button>
+                <button class="filter-btn" data-filter="hard">Difficile</button>
+                <button class="filter-btn" data-filter="extreme">Extrême</button>
+                <button class="filter-btn" data-filter="incomplete">Non complétés</button>
+            </div>
+            <div class="achievements-grid" id="achievementsGrid"></div>
+        </section>
+
+        <!-- RÉCOMPENSES -->
+        <section id="rewards" class="section">
+            <h2 style="margin-bottom: 20px;">🎁 Paliers de récompenses</h2>
+            <div class="rewards-shop" id="rewardsShop"></div>
+        </section>
+
+        <!-- HISTORIQUE -->
+        <section id="history" class="section">
+            <h2 style="margin-bottom: 20px;">📋 Derniers succès validés</h2>
+            <div class="history-list" id="historyList">
+                <p style="text-align: center; color: var(--text-muted); padding: 40px;">Aucun succès validé pour le moment</p>
+            </div>
+        </section>
+
+        <div class="reset-section">
+            <button class="reset-btn" onclick="resetAll()">🔄 Réinitialiser tout</button>
+        </div>
+    </div>
+
+    <!-- Modal de validation -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal">
+            <h3>🎉 Valider le succès</h3>
+            <p id="modalAchievement" style="margin-bottom: 15px; color: var(--text-muted);"></p>
+            <select id="playerSelect"></select>
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+                <button class="btn-confirm" id="confirmBtn" onclick="confirmComplete()">Valider !</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Achievements + rewardTiers (statiques, identiques pour tout le monde) -->
+    <script src="achievements-data.js"></script>
+
+    <!-- Firebase (temps réel, partagé entre tous les joueurs) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import {
+            getFirestore, collection, doc, setDoc, updateDoc, addDoc,
+            onSnapshot, getDocs, arrayUnion, increment, serverTimestamp,
+            query, orderBy, limit, writeBatch
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { firebaseConfig } from "./firebase-config.js";
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const playersCol = collection(db, "players");
+        const historyCol = collection(db, "history");
+
+        // Joueurs par défaut (utilisés uniquement pour initialiser la base la première fois)
+        const defaultPlayers = [
+            { id: "1", name: "Oméga" },
+            { id: "2", name: "Rayd" },
+            { id: "3", name: "Aria" },
+            { id: "4", name: "Dream" },
+            { id: "5", name: "Apérikube" }
+        ];
+
+        let players = [];   // rempli en temps réel depuis Firestore
+        let history = [];   // rempli en temps réel depuis Firestore
+        let currentAchievementId = null;
+        let currentFilter = 'all';
+
+        const statusEl = document.getElementById('connectionStatus');
+
+        // Crée les documents joueurs s'ils n'existent pas encore
+        async function ensurePlayersExist() {
+            const snap = await getDocs(playersCol);
+            if (snap.empty) {
+                const batch = writeBatch(db);
+                defaultPlayers.forEach(p => {
+                    batch.set(doc(db, "players", p.id), {
+                        name: p.name,
+                        points: 0,
+                        achievements: []
+                    });
+                });
+                await batch.commit();
+            }
+        }
+
+        // Écoute en temps réel des joueurs
+        function listenPlayers() {
+            onSnapshot(playersCol, (snap) => {
+                players = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                players.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+                renderLeaderboard();
+                renderAchievements();
+                renderRewards();
+                statusEl.textContent = "Connecté — données en temps réel";
+                statusEl.classList.remove('offline');
+                statusEl.classList.add('online');
+            }, (err) => {
+                console.error(err);
+                statusEl.textContent = "Erreur de connexion à Firebase (vérifie firebase-config.js et les règles Firestore)";
+            });
+        }
+
+        // Écoute en temps réel de l'historique (20 derniers)
+        function listenHistory() {
+            const q = query(historyCol, orderBy("date", "desc"), limit(20));
+            onSnapshot(q, (snap) => {
+                history = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderHistory();
+            });
+        }
+
+        // Afficher le classement
+        function renderLeaderboard() {
+            const sorted = [...players].sort((a, b) => b.points - a.points);
+            const container = document.getElementById('playerList');
+
+            container.innerHTML = sorted.map((player, index) => {
+                const rankClass = index < 3 ? `rank-${index + 1}` : 'rank-other';
+                const achievementCount = (player.achievements || []).length;
+
+                return `
+                    <div class="player-card">
+                        <div class="rank ${rankClass}">${index + 1}</div>
+                        <div class="player-info">
+                            <div class="player-name">${player.name}</div>
+                            <div class="player-stats">${achievementCount} succès complétés</div>
+                        </div>
+                        <div class="player-points">${player.points} <span>pts</span></div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Afficher les succès
+        function renderAchievements() {
+            const container = document.getElementById('achievementsGrid');
+            const completedIds = players.flatMap(p => p.achievements || []);
+
+            let filtered = achievements;
+            if (currentFilter !== 'all') {
+                if (currentFilter === 'incomplete') {
+                    filtered = achievements.filter(a => !completedIds.includes(a.id));
+                } else {
+                    filtered = achievements.filter(a => a.difficulty === currentFilter);
+                }
+            }
+
+            container.innerHTML = filtered.map(achievement => {
+                const isCompleted = completedIds.includes(achievement.id);
+                const completedBy = players.filter(p => (p.achievements || []).includes(achievement.id)).map(p => p.name);
+
+                return `
+                    <div class="achievement-card ${isCompleted ? 'completed' : ''}">
+                        <span class="difficulty ${achievement.difficulty}">
+                            ${achievement.difficulty === 'easy' ? 'Facile' :
+                              achievement.difficulty === 'medium' ? 'Moyen' :
+                              achievement.difficulty === 'hard' ? 'Difficile' : 'Extrême'}
+                        </span>
+                        <h3 class="achievement-title">${achievement.title}</h3>
+                        <p class="achievement-desc">${achievement.desc}</p>
+                        <div class="reward-box">
+                            <h4>🎁 Récompense</h4>
+                            <p>${achievement.reward}</p>
+                        </div>
+                        <span class="points-badge">⭐ ${achievement.points} points</span>
+                        ${isCompleted ?
+                            `<p style="margin-top: 10px; color: var(--success); font-size: 0.9rem;">✓ Complété par : ${completedBy.join(', ')}</p>` :
+                            `<button class="complete-btn" onclick="openModal(${achievement.id})">Marquer comme complété</button>`
+                        }
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Afficher les récompenses (paliers)
+        function renderRewards() {
+            const container = document.getElementById('rewardsShop');
+
+            container.innerHTML = rewardTiers.map(tier => {
+                const qualifiedPlayers = players.filter(p => p.points >= tier.points);
+
+                return `
+                    <div class="reward-card">
+                        <div class="reward-icon">${tier.icon}</div>
+                        <h3 class="reward-title">${tier.title}</h3>
+                        <div class="reward-cost">${tier.points} points requis</div>
+                        <p class="reward-desc">${tier.reward}</p>
+                        ${qualifiedPlayers.length > 0 ?
+                            `<p style="margin-top: 15px; color: var(--success); font-size: 0.85rem;">🎉 ${qualifiedPlayers.map(p => p.name).join(', ')}</p>` :
+                            ''
+                        }
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Afficher l'historique
+        function renderHistory() {
+            const container = document.getElementById('historyList');
+
+            if (history.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 40px;">Aucun succès validé pour le moment</p>';
+                return;
+            }
+
+            container.innerHTML = history.map(item => {
+                const dateStr = item.date && item.date.toDate
+                    ? item.date.toDate().toLocaleString('fr-FR')
+                    : '...';
+                const rewardStatus = item.rewardGiven
+                    ? '<div class="history-reward given">✅ Récompense donnée par le bot</div>'
+                    : '<div class="history-reward pending">⏳ Récompense en attente du bot</div>';
+
+                return `
+                <div class="history-item">
+                    <div class="history-icon">🏆</div>
+                    <div class="history-details">
+                        <div class="history-title">${item.playerName} a complété "${item.achievementTitle}"</div>
+                        <div class="history-meta">${dateStr}</div>
+                        ${rewardStatus}
+                    </div>
+                    <div class="history-points">+${item.points} pts</div>
+                </div>
+            `;
+            }).join('');
+        }
+
+        // Modal
+        window.openModal = function(achievementId) {
+            currentAchievementId = achievementId;
+            const achievement = achievements.find(a => a.id === achievementId);
+
+            document.getElementById('modalAchievement').textContent = achievement.title;
+
+            const select = document.getElementById('playerSelect');
+            select.innerHTML = players.map(p =>
+                `<option value="${p.id}">${p.name}</option>`
+            ).join('');
+
+            document.getElementById('modal').classList.add('active');
+        }
+
+        window.closeModal = function() {
+            document.getElementById('modal').classList.remove('active');
+            currentAchievementId = null;
+        }
+
+        window.confirmComplete = async function() {
+            const playerId = document.getElementById('playerSelect').value;
+            const player = players.find(p => p.id === playerId);
+            const achievement = achievements.find(a => a.id === currentAchievementId);
+            const confirmBtn = document.getElementById('confirmBtn');
+
+            if (!player || !achievement) return;
+
+            if ((player.achievements || []).includes(currentAchievementId)) {
+                showNotification('❌ Ce joueur a déjà ce succès !', true);
+                closeModal();
+                return;
+            }
+
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = "Validation...";
+
+            try {
+                // Met à jour le joueur (points + liste de succès)
+                await updateDoc(doc(db, "players", player.id), {
+                    points: increment(achievement.points),
+                    achievements: arrayUnion(achievement.id)
+                });
+
+                // Ajoute une entrée d'historique -> le bot la verra et donnera la récompense
+                await addDoc(historyCol, {
+                    playerId: player.id,
+                    playerName: player.name,
+                    achievementId: achievement.id,
+                    achievementTitle: achievement.title,
+                    reward: achievement.reward,
+                    points: achievement.points,
+                    date: serverTimestamp(),
+                    rewardGiven: false
+                });
+
+                showNotification(`🎉 ${player.name} +${achievement.points} points !`);
+            } catch (err) {
+                console.error(err);
+                showNotification('❌ Erreur lors de la validation, réessaie.', true);
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.textContent = "Valider !";
+                closeModal();
+            }
+        }
+
+        function showNotification(message, isError) {
+            const notif = document.getElementById('notification');
+            notif.textContent = message;
+            notif.classList.toggle('error', !!isError);
+            notif.classList.add('show');
+
+            setTimeout(() => {
+                notif.classList.remove('show');
+            }, 3000);
+        }
+
+        window.resetAll = async function() {
+            if (!confirm('⚠️ Voulez-vous vraiment réinitialiser toutes les données (points, succès, historique) pour TOUT LE MONDE ?')) {
+                return;
+            }
+
+            const batch = writeBatch(db);
+            for (const p of players) {
+                batch.update(doc(db, "players", p.id), { points: 0, achievements: [] });
+            }
+            await batch.commit();
+
+            const histSnap = await getDocs(historyCol);
+            const delBatch = writeBatch(db);
+            histSnap.forEach(d => delBatch.delete(d.ref));
+            await delBatch.commit();
+
+            showNotification('🔄 Données réinitialisées pour tout le monde');
+        }
+
+        // Navigation par onglets
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+
+                btn.classList.add('active');
+                document.getElementById(btn.dataset.tab).classList.add('active');
+            });
+        });
+
+        // Filtres
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderAchievements();
+            });
+        });
+
+        // Initialisation
+        (async function init() {
+            await ensurePlayersExist();
+            listenPlayers();
+            listenHistory();
+        })();
+    </script>
+</body>
+</html>
