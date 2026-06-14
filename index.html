@@ -584,6 +584,17 @@
             color: white;
         }
 
+        /* ===== Sélecteur de joueur sur l'onglet Succès ===== */
+        .ach-players { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+        .ach-players .bp-player { padding: 7px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18);
+            background: rgba(255,255,255,.06); color: var(--text, #e8edf5); cursor: pointer; font-weight: 600; font-size: .9rem; transition: .15s; }
+        .ach-players .bp-player span { color: var(--accent, #ffd23f); font-size: .8rem; }
+        .ach-players .bp-player:hover { border-color: var(--accent, #ffd23f); }
+        .ach-players .bp-player.active { background: var(--accent, #ffd23f); color: #1a1a2e; border-color: transparent; }
+        .ach-players .bp-player.active span { color: #1a1a2e; }
+        .ach-count { color: var(--text-muted); font-size: .95rem; margin-bottom: 18px; }
+        .ach-count b { color: var(--text, #e8edf5); }
+
         /* ===== Pass de combat — style MultiVersus ===== */
         .mv-wrap { background: linear-gradient(160deg, #2b2f7a 0%, #232a63 55%, #1c2150 100%);
             border-radius: 18px; padding: 26px 28px 30px; color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,.35); }
@@ -819,23 +830,44 @@
             }).join('');
         }
 
-        // Afficher les succès
+        // Joueur sélectionné pour la vue des succès (vue individuelle)
+        let achSelectedId = null;
+        window.achSelect = function (id) { achSelectedId = id; renderAchievements(); };
+
+        // Afficher les succès — vue PAR JOUEUR (chacun voit les siens)
         function renderAchievements() {
             const container = document.getElementById('achievementsGrid');
-            const completedIds = players.flatMap(p => p.achievements || []);
+            if (!players.length) { container.innerHTML = ''; return; }
+
+            if (!achSelectedId || !players.some(p => p.id === achSelectedId)) {
+                achSelectedId = players[0].id;
+            }
+            const player = players.find(p => p.id === achSelectedId);
+            const myIds = player.achievements || [];
+
+            // Sélecteur de joueurs + compteur individuel
+            const selector = `
+                <div class="ach-players" style="grid-column:1/-1;">
+                    ${players.map(pl => `
+                        <button class="bp-player ${pl.id === achSelectedId ? 'active' : ''}" onclick="achSelect('${pl.id}')">
+                            ${pl.name} <span>${(pl.achievements || []).length}/${achievements.length}</span>
+                        </button>`).join('')}
+                </div>
+                <div class="ach-count" style="grid-column:1/-1;">
+                    Succès de <b>${player.name}</b> : ${myIds.length} / ${achievements.length} · ${player.points} points
+                </div>`;
 
             let filtered = achievements;
             if (currentFilter !== 'all') {
                 if (currentFilter === 'incomplete') {
-                    filtered = achievements.filter(a => !completedIds.includes(a.id));
+                    filtered = achievements.filter(a => !myIds.includes(a.id));
                 } else {
                     filtered = achievements.filter(a => a.difficulty === currentFilter);
                 }
             }
 
-            container.innerHTML = filtered.map(achievement => {
-                const isCompleted = completedIds.includes(achievement.id);
-                const completedBy = players.filter(p => (p.achievements || []).includes(achievement.id)).map(p => p.name);
+            const cards = filtered.map(achievement => {
+                const isCompleted = myIds.includes(achievement.id);
 
                 return `
                     <div class="achievement-card ${isCompleted ? 'completed' : ''}">
@@ -852,12 +884,14 @@
                         </div>
                         <span class="points-badge">⭐ ${achievement.points} points</span>
                         ${isCompleted ?
-                            `<p style="margin-top: 10px; color: var(--success); font-size: 0.9rem;">✓ Complété par : ${completedBy.join(', ')}</p>` :
+                            `<p style="margin-top: 10px; color: var(--success); font-size: 0.9rem;">✓ Complété par ${player.name}</p>` :
                             `<button class="complete-btn" onclick="openModal(${achievement.id})">Marquer comme complété</button>`
                         }
                     </div>
                 `;
             }).join('');
+
+            container.innerHTML = selector + cards;
         }
 
         // Afficher les récompenses (paliers)
