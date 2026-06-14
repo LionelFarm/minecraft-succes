@@ -677,11 +677,11 @@
 
         // Joueurs par défaut (utilisés uniquement pour initialiser la base la première fois)
         const defaultPlayers = [
-            { id: "1", name: "Oméga" },
-            { id: "2", name: "Rayd" },
-            { id: "3", name: "Aria" },
-            { id: "4", name: "Dream" },
-            { id: "5", name: "Apérikube" }
+            { id: "1", name: "Oméga", minecraftUsername: "OmegaHyvi" },
+            { id: "2", name: "Rayd", minecraftUsername: "Rayd" },
+            { id: "3", name: "Aria", minecraftUsername: "Aria" },
+            { id: "4", name: "Dream", minecraftUsername: "Dream" },
+            { id: "5", name: "Apérikube", minecraftUsername: "Aperikube" }
         ];
 
         let players = [];   // rempli en temps réel depuis Firestore
@@ -699,6 +699,7 @@
                 defaultPlayers.forEach(p => {
                     batch.set(doc(db, "players", p.id), {
                         name: p.name,
+                        minecraftUsername: p.minecraftUsername,
                         points: 0,
                         achievements: []
                     });
@@ -897,6 +898,7 @@
                 await addDoc(historyCol, {
                     playerId: player.id,
                     playerName: player.name,
+                    minecraftUsername: player.minecraftUsername || player.name,
                     achievementId: achievement.id,
                     achievementTitle: achievement.title,
                     reward: achievement.reward,
