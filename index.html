@@ -849,6 +849,7 @@
                 renderAchievements();
                 renderRewards();
                 renderBattlepass();
+                renderFactionPass();
                 statusEl.textContent = "Connecté — données en temps réel";
                 statusEl.classList.remove('offline');
                 statusEl.classList.add('online');
@@ -1004,7 +1005,8 @@
             const p = players.find(pl => pl.id === bpSelectedId);
 
             const pass = p.pass || { stars: 0, tier: 0 };
-            const quests = p.quests || [];
+            // Les quêtes de guerre (cat "guerre") sont affichées dans le Pass de Faction.
+            const quests = (p.quests || []).filter(q => q.cat !== 'guerre');
             const tier = pass.tier || 0;
             const stars = pass.stars || 0;
             const maxTier = passTiersData.length;
@@ -1084,7 +1086,9 @@
 
         // Sélection de la faction affichée dans le pass de faction
         let fpSelectedId = null;
+        let fpQuestPid = null; // joueur sélectionné pour les missions de guerre
         window.fpSelect = function (id) { fpSelectedId = id; renderFactionPass(); };
+        window.fpQuestSelect = function (id) { fpQuestPid = id; renderFactionPass(); };
 
         // Afficher le PASS DE FACTION (étoiles communes, style MultiVersus)
         function renderFactionPass() {
@@ -1136,6 +1140,48 @@
                     </div>`;
             }).join('');
 
+            // ---- Panneau "Missions de guerre" (quêtes cat "guerre" par joueur) ----
+            let warPanel = '';
+            if (players.length) {
+                if (!fpQuestPid || !players.some(pl => pl.id === fpQuestPid)) fpQuestPid = players[0].id;
+                const wp = players.find(pl => pl.id === fpQuestPid);
+                const warQuests = (wp.quests || []).filter(q => q.cat === 'guerre');
+                const warDone = warQuests.filter(q => q.done).length;
+                const CM = ['c_walk', 'c_swim', 'c_sprint', 'c_cart'];
+
+                const qSelector = players.map(pl => `
+                    <button class="mv-player ${pl.id === fpQuestPid ? 'active' : ''}" onclick="fpQuestSelect('${pl.id}')">
+                        ${pl.name}
+                    </button>`).join('');
+
+                const warMissions = warQuests.length ? warQuests.map(q => {
+                    const div = CM.includes(q.objective) ? 100 : 1;
+                    const rawProg = Math.min(q.progress || 0, q.target);
+                    const qpct = Math.min(100, Math.round((rawProg / q.target) * 100));
+                    const prog = Math.round(rawProg / div);
+                    const target = Math.round(q.target / div);
+                    return `
+                        <div class="mv-mission">
+                            <div class="mv-mission-label">${q.label}</div>
+                            <div class="mv-mission-bar">
+                                <div class="mv-bar ${q.done ? 'done' : ''}"><div class="mv-bar-fill" style="width:${qpct}%"></div></div>
+                                <span class="mv-plus">+${q.stars}⭐</span>
+                            </div>
+                            <div class="mv-mission-prog">${prog} / ${target}</div>
+                        </div>`;
+                }).join('') : '<p style="color:#b8c4e0;font-size:.9rem;">Les quêtes de guerre apparaîtront quand ce joueur se connecte au serveur.</p>';
+
+                warPanel = `
+                    <div class="mv-panel" style="margin-top:20px;">
+                        <div class="mv-panel-head">
+                            <span class="mv-panel-title">⚔ MISSIONS DE GUERRE (étoiles communes)</span>
+                            <span class="mv-complete">${warDone}/${warQuests.length || 5} COMPLÈTE(S) ${warDone === 5 ? '✔' : ''}</span>
+                        </div>
+                        <div class="mv-players">${qSelector}</div>
+                        <div class="mv-missions">${warMissions}</div>
+                    </div>`;
+            }
+
             container.innerHTML = `
                 <div class="mv-wrap">
                     <div class="mv-top">
@@ -1143,6 +1189,7 @@
                         <div class="mv-top-stars">${stars} <b>⭐ communes</b></div>
                     </div>
                     <div class="mv-players">${selector}</div>
+                    ${warPanel}
                     <div class="mv-rewards-head">
                         ${finished ? '🏆 Pass de faction terminé — trésor de guerre débloqué !'
                                    : `Palier ${tier}/${maxTier} · <b>${need}⭐ communes</b> pour le palier ${tier + 1}`}
