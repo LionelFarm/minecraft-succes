@@ -584,54 +584,52 @@
             color: white;
         }
 
-        /* ===== Pass de combat ===== */
-        .bp-bar { background: rgba(255,255,255,.12); border-radius: 999px; height: 8px; overflow: hidden; }
-        .bp-bar.big { height: 16px; margin: 4px 0 8px; }
-        .bp-bar-fill { height: 100%; background: linear-gradient(90deg, #f5c518, #ff8a00); border-radius: 999px; transition: width .5s ease; }
+        /* ===== Pass de combat — style MultiVersus ===== */
+        .mv-wrap { background: linear-gradient(160deg, #2b2f7a 0%, #232a63 55%, #1c2150 100%);
+            border-radius: 18px; padding: 26px 28px 30px; color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,.35); }
+        .mv-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .mv-title { font-size: 1.9rem; font-weight: 800; letter-spacing: .5px; }
+        .mv-top-stars { font-size: 1.5rem; font-weight: 800; color: #ffd23f; }
 
-        /* Sélecteur de joueurs */
-        .bp-players { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
-        .bp-player-btn { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 16px; border-radius: 12px;
-            border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.04); color: var(--text, #e8edf5); cursor: pointer;
-            font-size: .95rem; font-weight: 600; transition: all .15s; }
-        .bp-player-btn:hover { border-color: #f5c518; }
-        .bp-player-btn.active { background: linear-gradient(135deg, #f5c518, #ff8a00); color: #1a1a1a; border-color: transparent; }
-        .bp-player-stars { font-size: .75rem; font-weight: 700; opacity: .85; }
+        .mv-players { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+        .mv-player { padding: 7px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.18);
+            background: rgba(255,255,255,.06); color: #dfe4ff; cursor: pointer; font-weight: 600; font-size: .9rem; transition: .15s; }
+        .mv-player span { color: #ffd23f; font-size: .8rem; }
+        .mv-player:hover { border-color: #ffd23f; }
+        .mv-player.active { background: #ffd23f; color: #20235a; border-color: #ffd23f; }
+        .mv-player.active span { color: #20235a; }
 
-        /* En-tête héros */
-        .bp-hero { background: linear-gradient(135deg, rgba(245,197,24,.12), rgba(255,138,0,.06)); border: 1px solid rgba(245,197,24,.25);
-            border-radius: 16px; padding: 22px; margin-bottom: 26px; }
-        .bp-hero-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-        .bp-hero-name { font-size: 1.6rem; font-weight: 800; }
-        .bp-hero-stars { font-size: 1.6rem; font-weight: 800; color: #f5c518; }
-        .bp-hero-stars span { font-size: 1.2rem; }
-        .bp-hero-sub { color: var(--text-muted); font-size: .95rem; margin: 4px 0 14px; }
-        .bp-next { font-size: .9rem; color: var(--text-muted); }
-        .bp-next b { color: var(--text, #e8edf5); }
+        .mv-panel { background: rgba(0,0,0,.18); border-radius: 14px; padding: 18px 20px; margin-bottom: 24px; }
+        .mv-panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+            border-bottom: 2px solid rgba(255,255,255,.15); padding-bottom: 10px; margin-bottom: 16px; }
+        .mv-panel-title { font-weight: 800; letter-spacing: 1px; font-size: .95rem; color: #cdd4ff; }
+        .mv-complete { color: #57e08a; font-weight: 700; font-size: .85rem; }
+        .mv-missions { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px 28px; }
+        .mv-mission-label { font-size: .9rem; font-weight: 600; color: #e9ecff; margin-bottom: 7px; text-transform: uppercase; letter-spacing: .3px; }
+        .mv-mission-bar { display: flex; align-items: center; gap: 10px; }
+        .mv-plus { color: #ffd23f; font-weight: 700; font-size: .82rem; white-space: nowrap; }
+        .mv-mission-prog { font-size: .75rem; color: #9aa4d6; margin-top: 4px; }
 
-        .bp-section-title { font-weight: 700; font-size: 1.05rem; margin: 8px 0 14px; }
+        .mv-bar { flex: 1; background: rgba(255,255,255,.14); border-radius: 999px; height: 12px; overflow: hidden; }
+        .mv-bar-fill { height: 100%; background: linear-gradient(90deg, #ff5d8f, #ff7eb3); border-radius: 999px; transition: width .5s ease; }
+        .mv-bar.done .mv-bar-fill { background: linear-gradient(90deg, #2fd47a, #57e08a); }
 
-        /* Piste de paliers horizontale */
-        .bp-track-wrap { overflow-x: auto; padding-bottom: 14px; margin-bottom: 26px; }
-        .bp-track { display: flex; gap: 12px; min-width: min-content; }
-        .bp-node { flex: 0 0 130px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); border-radius: 12px;
-            padding: 12px 10px; text-align: center; position: relative; transition: all .2s; }
-        .bp-node.unlocked { background: linear-gradient(160deg, rgba(245,197,24,.18), rgba(255,138,0,.08)); border-color: #f5c518; }
-        .bp-node.next { border-color: #4da3ff; box-shadow: 0 0 0 2px rgba(77,163,255,.35); }
-        .bp-node-num { width: 34px; height: 34px; line-height: 34px; border-radius: 50%; margin: 0 auto 8px; font-weight: 800;
-            background: rgba(255,255,255,.1); color: var(--text-muted); }
-        .bp-node.unlocked .bp-node-num { background: #f5c518; color: #1a1a1a; }
-        .bp-node.next .bp-node-num { background: #4da3ff; color: #fff; }
-        .bp-node-cost { font-size: .75rem; color: #f5c518; font-weight: 700; margin-bottom: 6px; }
-        .bp-node-reward { font-size: .78rem; line-height: 1.25; color: var(--text, #e8edf5); }
+        .mv-rewards-head { font-size: 1.1rem; font-weight: 700; text-align: center; margin-bottom: 16px; color: #eef0ff; }
+        .mv-rewards-head b { color: #ffd23f; }
 
-        /* Quêtes du jour */
-        .bp-quests { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
-        .bp-quest { background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; padding: 12px 14px; }
-        .bp-quest.done { opacity: .65; border-color: rgba(80,200,120,.4); }
-        .bp-quest-top { display: flex; justify-content: space-between; gap: 8px; font-size: .92rem; font-weight: 600; margin-bottom: 8px; }
-        .bp-quest-stars { white-space: nowrap; }
-        .bp-quest-prog { text-align: right; font-size: .78rem; color: var(--text-muted); margin-top: 5px; }
+        .mv-track-wrap { overflow-x: auto; padding-bottom: 12px; }
+        .mv-track { display: flex; gap: 10px; min-width: min-content; padding: 4px; }
+        .mv-node { flex: 0 0 120px; display: flex; flex-direction: column; align-items: center;
+            background: rgba(255,255,255,.05); border: 2px solid rgba(255,255,255,.12); border-radius: 12px;
+            padding: 12px 8px; text-align: center; transition: .2s; }
+        .mv-node.unlocked { background: linear-gradient(170deg, rgba(255,210,63,.22), rgba(255,210,63,.06)); border-color: #ffd23f; }
+        .mv-node.next { border-color: #4da3ff; box-shadow: 0 0 0 3px rgba(77,163,255,.4); }
+        .mv-reward { font-size: .76rem; line-height: 1.25; min-height: 48px; display: flex; align-items: center; color: #eef0ff; }
+        .mv-badge { width: 32px; height: 32px; line-height: 30px; border-radius: 50%; margin: 8px 0 6px; font-weight: 800;
+            border: 2px solid rgba(255,255,255,.25); background: rgba(0,0,0,.25); color: #cdd4ff; }
+        .mv-node.unlocked .mv-badge { background: #ffd23f; color: #20235a; border-color: #ffd23f; }
+        .mv-node.next .mv-badge { background: #4da3ff; color: #fff; border-color: #4da3ff; }
+        .mv-cost { font-size: .72rem; font-weight: 700; color: #ffd23f; }
     </style>
 </head>
 <body>
@@ -882,7 +880,7 @@
         let bpSelectedId = null;
         window.bpSelect = function (id) { bpSelectedId = id; renderBattlepass(); };
 
-        // Afficher le pass de combat : sélecteur + piste de paliers + quêtes du jour
+        // Afficher le pass de combat (style MultiVersus)
         function renderBattlepass() {
             const container = document.getElementById('battlepassContent');
             if (!players.length) {
@@ -895,81 +893,71 @@
             }
             const p = players.find(pl => pl.id === bpSelectedId);
 
-            // --- Sélecteur de joueurs ---
-            const selector = `
-                <div class="bp-players">
-                    ${players.map(pl => `
-                        <button class="bp-player-btn ${pl.id === bpSelectedId ? 'active' : ''}" onclick="bpSelect('${pl.id}')">
-                            ${pl.name}
-                            <span class="bp-player-stars">${(pl.pass && pl.pass.stars) || 0} ⭐</span>
-                        </button>`).join('')}
-                </div>`;
-
             const pass = p.pass || { stars: 0, tier: 0 };
             const quests = p.quests || [];
             const tier = pass.tier || 0;
             const stars = pass.stars || 0;
             const maxTier = passTiersData.length;
             const finished = tier >= maxTier;
-            const nextNeed = (tier + 1) * PASS_TIER_COST;
-            const intoTier = stars - tier * PASS_TIER_COST;
-            const pct = finished ? 100 : Math.min(100, Math.round((intoTier / PASS_TIER_COST) * 100));
-            const nextTier = passTiersData.find(t => t.tier === tier + 1);
+            const need = Math.max(0, (tier + 1) * PASS_TIER_COST - stars);
+            const doneCount = quests.filter(q => q.done).length;
 
-            // --- En-tête ---
-            const header = `
-                <div class="bp-hero">
-                    <div class="bp-hero-top">
-                        <div class="bp-hero-name">${p.name}</div>
-                        <div class="bp-hero-stars">${stars} <span>⭐</span></div>
-                    </div>
-                    <div class="bp-hero-sub">Palier <b>${tier}</b> / ${maxTier}${finished ? ' — 🏆 Pass terminé !' : ''}</div>
-                    <div class="bp-bar big"><div class="bp-bar-fill" style="width:${pct}%"></div></div>
-                    <div class="bp-next">${finished
-                        ? 'Toutes les récompenses ont été débloquées !'
-                        : `Plus que <b>${Math.max(0, nextNeed - stars)} ⭐</b> pour le palier ${tier + 1} : <b>${nextTier ? nextTier.label : ''}</b>`}</div>
-                </div>`;
+            const selector = players.map(pl => `
+                <button class="mv-player ${pl.id === bpSelectedId ? 'active' : ''}" onclick="bpSelect('${pl.id}')">
+                    ${pl.name} <span>${(pl.pass && pl.pass.stars) || 0}⭐</span>
+                </button>`).join('');
 
-            // --- Piste de paliers (horizontale, scrollable) ---
-            const track = `
-                <div class="bp-track-wrap">
-                    <div class="bp-track">
-                        ${passTiersData.map(t => {
-                            const unlocked = t.tier <= tier;
-                            const isNext = t.tier === tier + 1;
-                            return `
-                                <div class="bp-node ${unlocked ? 'unlocked' : ''} ${isNext ? 'next' : ''}">
-                                    <div class="bp-node-num">${unlocked ? '✓' : t.tier}</div>
-                                    <div class="bp-node-cost">${t.tier * PASS_TIER_COST}⭐</div>
-                                    <div class="bp-node-reward">${t.label}</div>
-                                </div>`;
-                        }).join('')}
-                    </div>
-                </div>`;
-
-            // --- Quêtes du jour ---
-            const questsHtml = quests.length ? quests.map(q => {
+            const missions = quests.length ? quests.map(q => {
                 const prog = Math.min(q.progress || 0, q.target);
                 const qpct = Math.min(100, Math.round((prog / q.target) * 100));
-                const starsTxt = '⭐'.repeat(q.stars);
                 return `
-                    <div class="bp-quest ${q.done ? 'done' : ''}">
-                        <div class="bp-quest-top">
-                            <span>${q.done ? '✅ ' : ''}${q.label}</span>
-                            <span class="bp-quest-stars">${starsTxt}</span>
+                    <div class="mv-mission">
+                        <div class="mv-mission-label">${q.label}</div>
+                        <div class="mv-mission-bar">
+                            <div class="mv-bar ${q.done ? 'done' : ''}"><div class="mv-bar-fill" style="width:${qpct}%"></div></div>
+                            <span class="mv-plus">+${q.stars}⭐</span>
                         </div>
-                        <div class="bp-bar"><div class="bp-bar-fill" style="width:${qpct}%"></div></div>
-                        <div class="bp-quest-prog">${prog} / ${q.target}</div>
+                        <div class="mv-mission-prog">${prog} / ${q.target}</div>
                     </div>`;
-            }).join('') : '<p style="color:var(--text-muted);font-size:.9rem;grid-column:1/-1;">Les 6 quêtes du jour apparaîtront quand ce joueur se connecte au serveur.</p>';
+            }).join('') : '<p style="color:#b8c4e0;font-size:.9rem;">Les 6 missions du jour apparaîtront quand ce joueur se connecte au serveur.</p>';
+
+            const track = passTiersData.map(t => {
+                const unlocked = t.tier <= tier;
+                const isNext = t.tier === tier + 1;
+                return `
+                    <div class="mv-node ${unlocked ? 'unlocked' : ''} ${isNext ? 'next' : ''}">
+                        <div class="mv-reward">${t.label}</div>
+                        <div class="mv-badge">${unlocked ? '✔' : t.tier}</div>
+                        <div class="mv-cost">${t.tier * PASS_TIER_COST}⭐</div>
+                    </div>`;
+            }).join('');
 
             container.innerHTML = `
-                ${selector}
-                ${header}
-                <div class="bp-section-title">🎁 Paliers de récompenses</div>
-                ${track}
-                <div class="bp-section-title">📋 Quêtes du jour</div>
-                <div class="bp-quests">${questsHtml}</div>`;
+                <div class="mv-wrap">
+                    <div class="mv-top">
+                        <div class="mv-title">🛡️ Passe de combat</div>
+                        <div class="mv-top-stars">${stars} <b>⭐</b></div>
+                    </div>
+                    <div class="mv-players">${selector}</div>
+                    <div class="mv-panel">
+                        <div class="mv-panel-head">
+                            <span class="mv-panel-title">MISSIONS D'AUJOURD'HUI</span>
+                            <span class="mv-complete">${doneCount}/${quests.length || 6} COMPLÈTE(S) ${doneCount === 6 ? '✔' : ''}</span>
+                        </div>
+                        <div class="mv-missions">${missions}</div>
+                    </div>
+                    <div class="mv-rewards-head">
+                        ${finished ? '🏆 Pass terminé — toutes les récompenses débloquées !'
+                                   : `<b>${need}⭐</b> pour les récompenses du palier ${tier + 1}`}
+                    </div>
+                    <div class="mv-track-wrap"><div class="mv-track">${track}</div></div>
+                </div>`;
+
+            // Centre la piste sur le prochain palier
+            requestAnimationFrame(() => {
+                const el = container.querySelector('.mv-node.next');
+                if (el) el.scrollIntoView({ inline: 'center', block: 'nearest' });
+            });
         }
 
         // Afficher l'historique
