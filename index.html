@@ -624,7 +624,13 @@
             padding: 12px 8px; text-align: center; transition: .2s; }
         .mv-node.unlocked { background: linear-gradient(170deg, rgba(255,210,63,.22), rgba(255,210,63,.06)); border-color: #ffd23f; }
         .mv-node.next { border-color: #4da3ff; box-shadow: 0 0 0 3px rgba(77,163,255,.4); }
-        .mv-reward { font-size: .76rem; line-height: 1.25; min-height: 48px; display: flex; align-items: center; color: #eef0ff; }
+        .mv-icon { position: relative; width: 56px; height: 56px; margin-bottom: 6px; display: flex; align-items: center; justify-content: center; }
+        .mv-icon img { width: 48px; height: 48px; image-rendering: pixelated; }
+        .mv-count { position: absolute; right: -4px; bottom: -2px; background: #20235a; color: #fff; font-size: .72rem; font-weight: 800;
+            padding: 1px 5px; border-radius: 7px; border: 1px solid rgba(255,255,255,.25); text-shadow: 1px 1px 0 #000; }
+        .mv-extra { position: absolute; left: -4px; top: -2px; background: #ff5d8f; color: #fff; font-size: .68rem; font-weight: 800;
+            padding: 1px 5px; border-radius: 7px; }
+        .mv-reward { font-size: .76rem; line-height: 1.25; min-height: 44px; display: flex; align-items: center; color: #eef0ff; }
         .mv-badge { width: 32px; height: 32px; line-height: 30px; border-radius: 50%; margin: 8px 0 6px; font-weight: 800;
             border: 2px solid rgba(255,255,255,.25); background: rgba(0,0,0,.25); color: #cdd4ff; }
         .mv-node.unlocked .mv-badge { background: #ffd23f; color: #20235a; border-color: #ffd23f; }
@@ -924,8 +930,15 @@
             const track = passTiersData.map(t => {
                 const unlocked = t.tier <= tier;
                 const isNext = t.tier === tier + 1;
+                const icon = `${PASS_ICON_BASE}${t.icon}.png`;
+                const countBadge = t.count > 1 ? `<span class="mv-count">x${t.count}</span>` : '';
+                const extraBadge = t.extra > 0 ? `<span class="mv-extra">+${t.extra}</span>` : '';
                 return `
                     <div class="mv-node ${unlocked ? 'unlocked' : ''} ${isNext ? 'next' : ''}">
+                        <div class="mv-icon">
+                            <img src="${icon}" alt="" loading="lazy" onerror="this.style.display='none'">
+                            ${countBadge}${extraBadge}
+                        </div>
                         <div class="mv-reward">${t.label}</div>
                         <div class="mv-badge">${unlocked ? '✔' : t.tier}</div>
                         <div class="mv-cost">${t.tier * PASS_TIER_COST}⭐</div>
