@@ -646,6 +646,7 @@
             border: 2px solid rgba(255,255,255,.25); background: rgba(0,0,0,.25); color: #cdd4ff; }
         .mv-node.unlocked .mv-badge { background: #ffd23f; color: #20235a; border-color: #ffd23f; }
         .mv-node.next .mv-badge { background: #4da3ff; color: #fff; border-color: #4da3ff; }
+        .mv-money { font-size: .72rem; font-weight: 700; color: #57e08a; margin-bottom: 2px; }
         .mv-cost { font-size: .72rem; font-weight: 700; color: #ffd23f; }
     </style>
 </head>
@@ -759,6 +760,10 @@
 
         let players = [];   // rempli en temps réel depuis Firestore
         let history = [];   // rempli en temps réel depuis Firestore
+
+        // Récompenses en argent (doit correspondre à bot.js : MONEY_PER_POINT / MONEY_PER_TIER)
+        const MONEY_PER_POINT = 1;  // succès : € = points × ceci
+        const MONEY_PER_TIER = 5;   // pass   : € = n° palier × ceci
         let currentAchievementId = null;
         let currentFilter = 'all';
 
@@ -881,6 +886,7 @@
                         <div class="reward-box">
                             <h4>🎁 Récompense</h4>
                             <p>${achievement.reward}</p>
+                            <p style="color:#3fbf6a;font-weight:600;margin-top:4px;">💶 + ${achievement.points * MONEY_PER_POINT} €</p>
                         </div>
                         <span class="points-badge">⭐ ${achievement.points} points</span>
                         ${isCompleted ?
@@ -974,6 +980,7 @@
                             ${countBadge}${extraBadge}
                         </div>
                         <div class="mv-reward">${t.label}</div>
+                        <div class="mv-money">+ ${t.tier * MONEY_PER_TIER} €</div>
                         <div class="mv-badge">${unlocked ? '✔' : t.tier}</div>
                         <div class="mv-cost">${t.tier * PASS_TIER_COST}⭐</div>
                     </div>`;
