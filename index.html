@@ -595,6 +595,39 @@
         .ach-count { color: var(--text-muted); font-size: .95rem; margin-bottom: 18px; }
         .ach-count b { color: var(--text, #e8edf5); }
 
+        /* ===== Gros classement des factions ===== */
+        .fr-sort { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+        .fr-sort-btn { padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,.14);
+            background: rgba(255,255,255,.05); color: var(--text-muted); cursor: pointer; font-weight: 700; font-size: .88rem; transition: .15s; }
+        .fr-sort-btn:hover { border-color: #ffd23f; color: #fff; }
+        .fr-sort-btn.active { background: linear-gradient(135deg, #ffb02e, #ff7a18); color: #1a1030; border-color: transparent; }
+        .fr-empty { text-align: center; padding: 50px 20px; background: rgba(255,255,255,.03); border-radius: 16px; }
+        .fr-list { display: flex; flex-direction: column; gap: 12px; }
+        .fr-card { display: flex; align-items: center; gap: 16px; padding: 16px 20px; border-radius: 14px;
+            background: linear-gradient(160deg, #2a2f63 0%, #20264f 100%); border: 1px solid rgba(255,255,255,.08);
+            box-shadow: 0 6px 22px rgba(0,0,0,.25); transition: transform .15s; }
+        .fr-card:hover { transform: translateX(4px); }
+        .fr-card.top1 { border-color: #ffd23f; box-shadow: 0 0 0 1px #ffd23f, 0 8px 30px rgba(255,210,63,.25); }
+        .fr-card.top2 { border-color: #c8d2e8; }
+        .fr-card.top3 { border-color: #e0935a; }
+        .fr-badge { font-size: 1.9rem; min-width: 48px; text-align: center; }
+        .fr-rank-num { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px;
+            border-radius: 50%; background: rgba(255,255,255,.08); color: #cfd6f5; font-weight: 800; font-size: 1.05rem; }
+        .fr-main { flex: 1; min-width: 0; }
+        .fr-name { font-size: 1.3rem; font-weight: 800; color: #fff; }
+        .fr-sub { font-size: .82rem; color: #9aa6d6; margin-top: 2px; }
+        .fr-stats { display: flex; gap: 10px; flex-wrap: wrap; }
+        .fr-stat { display: flex; flex-direction: column; align-items: center; min-width: 64px; padding: 8px 10px;
+            border-radius: 10px; background: rgba(255,255,255,.04); }
+        .fr-stat.hot { background: rgba(255,178,46,.16); box-shadow: inset 0 0 0 1px rgba(255,178,46,.4); }
+        .fr-stat-ic { font-size: 1.1rem; }
+        .fr-stat-v { font-size: 1.15rem; font-weight: 800; color: #ffd23f; margin-top: 2px; }
+        @media (max-width: 640px) {
+            .fr-card { flex-wrap: wrap; }
+            .fr-stats { width: 100%; justify-content: space-between; }
+            .fr-stat { flex: 1; }
+        }
+
         /* ===== Pass de combat — style MultiVersus ===== */
         .mv-wrap { background: linear-gradient(160deg, #2b2f7a 0%, #232a63 55%, #1c2150 100%);
             border-radius: 18px; padding: 26px 28px 30px; color: #fff; box-shadow: 0 12px 40px rgba(0,0,0,.35); }
@@ -662,6 +695,8 @@
             <button class="tab-btn active" data-tab="leaderboard">🏆 Classement</button>
             <button class="tab-btn" data-tab="achievements">📜 Succès</button>
             <button class="tab-btn" data-tab="battlepass">⚔️ Pass de combat</button>
+            <button class="tab-btn" data-tab="factionpass">🏴 Pass de Faction</button>
+            <button class="tab-btn" data-tab="factionrank">🏆 Classement Factions</button>
             <button class="tab-btn" data-tab="rewards">🎁 Récompenses</button>
             <button class="tab-btn" data-tab="history">📋 Historique</button>
         </nav>
@@ -692,6 +727,21 @@
             <h2 style="margin-bottom: 8px;">⚔️ Pass de combat</h2>
             <p style="color: var(--text-muted); margin-bottom: 20px;">6 quêtes par jour rapportent des étoiles ⭐. Chaque palier débloqué est récompensé automatiquement en jeu.</p>
             <div id="battlepassContent"></div>
+        </section>
+
+        <!-- CLASSEMENT FACTIONS -->
+        <section id="factionrank" class="section">
+            <h2 style="margin-bottom: 8px;">🏆 Classement des Factions</h2>
+            <p style="color: var(--text-muted); margin-bottom: 16px;">La domination du serveur en temps réel : puissance, territoires conquis, membres et étoiles du pass.</p>
+            <div class="fr-sort" id="frSort"></div>
+            <div id="factionRankContent"></div>
+        </section>
+
+        <!-- PASS DE FACTION -->
+        <section id="factionpass" class="section">
+            <h2 style="margin-bottom: 8px;">🏴 Pass de Faction</h2>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">Les quêtes de guerre ⚔ de chaque membre rapportent des étoiles <b>communes</b> à la faction. Chaque palier débloqué récompense <b>tous les membres en ligne</b> (objets + €).</p>
+            <div id="factionpassContent"></div>
         </section>
 
         <!-- RÉCOMPENSES -->
@@ -732,6 +782,7 @@
     <!-- Achievements + rewardTiers (statiques, identiques pour tout le monde) -->
     <script src="achievements-data.js"></script>
     <script src="battlepass-data.js"></script>
+    <script src="faction-pass-data.js"></script>
 
     <!-- Firebase (temps réel, partagé entre tous les joueurs) -->
     <script type="module">
@@ -748,6 +799,7 @@
 
         const playersCol = collection(db, "players");
         const historyCol = collection(db, "history");
+        const factionsCol = collection(db, "factions");
 
         // Joueurs par défaut (utilisés uniquement pour initialiser la base la première fois)
         const defaultPlayers = [
@@ -761,6 +813,7 @@
 
         let players = [];   // rempli en temps réel depuis Firestore
         let history = [];   // rempli en temps réel depuis Firestore
+        let factions = [];  // pass de faction, rempli en temps réel
 
         // Récompenses en argent (doit correspondre à bot.js : MONEY_PER_POINT / MONEY_PER_TIER)
         const MONEY_PER_POINT = 1;  // succès : € = points × ceci
@@ -803,6 +856,16 @@
                 console.error(err);
                 statusEl.textContent = "Erreur de connexion à Firebase (vérifie firebase-config.js et les règles Firestore)";
             });
+        }
+
+        // Écoute en temps réel des factions (pass de faction)
+        function listenFactions() {
+            onSnapshot(factionsCol, (snap) => {
+                factions = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                factions.sort((a, b) => (b.stars || 0) - (a.stars || 0));
+                renderFactionPass();
+                renderFactionRank();
+            }, (err) => console.error("factions:", err));
         }
 
         // Écoute en temps réel de l'historique (20 derniers)
@@ -954,9 +1017,13 @@
                     ${pl.name} <span>${(pl.pass && pl.pass.stars) || 0}⭐</span>
                 </button>`).join('');
 
+            const CM_OBJECTIVES = ['c_walk', 'c_swim', 'c_sprint', 'c_cart'];
             const missions = quests.length ? quests.map(q => {
-                const prog = Math.min(q.progress || 0, q.target);
-                const qpct = Math.min(100, Math.round((prog / q.target) * 100));
+                const div = CM_OBJECTIVES.includes(q.objective) ? 100 : 1;
+                const rawProg = Math.min(q.progress || 0, q.target);
+                const qpct = Math.min(100, Math.round((rawProg / q.target) * 100));
+                const prog = Math.round(rawProg / div);
+                const target = Math.round(q.target / div);
                 return `
                     <div class="mv-mission">
                         <div class="mv-mission-label">${q.label}</div>
@@ -964,9 +1031,9 @@
                             <div class="mv-bar ${q.done ? 'done' : ''}"><div class="mv-bar-fill" style="width:${qpct}%"></div></div>
                             <span class="mv-plus">+${q.stars}⭐</span>
                         </div>
-                        <div class="mv-mission-prog">${prog} / ${q.target}</div>
+                        <div class="mv-mission-prog">${prog} / ${target}</div>
                     </div>`;
-            }).join('') : '<p style="color:#b8c4e0;font-size:.9rem;">Les 6 missions du jour apparaîtront quand ce joueur se connecte au serveur.</p>';
+            }).join('') : '<p style="color:#b8c4e0;font-size:.9rem;">Les missions du jour apparaîtront quand ce joueur se connecte au serveur.</p>';
 
             const track = passTiersData.map(t => {
                 const unlocked = t.tier <= tier;
@@ -1013,6 +1080,141 @@
                 const el = container.querySelector('.mv-node.next');
                 if (el) el.scrollIntoView({ inline: 'center', block: 'nearest' });
             });
+        }
+
+        // Sélection de la faction affichée dans le pass de faction
+        let fpSelectedId = null;
+        window.fpSelect = function (id) { fpSelectedId = id; renderFactionPass(); };
+
+        // Afficher le PASS DE FACTION (étoiles communes, style MultiVersus)
+        function renderFactionPass() {
+            const container = document.getElementById('factionpassContent');
+            if (!container) return;
+
+            if (!factions.length) {
+                container.innerHTML = `
+                    <div class="mv-wrap" style="text-align:center;padding:50px 20px;">
+                        <div style="font-size:2.4rem;margin-bottom:12px;">🏴</div>
+                        <p style="color:#e6ecff;font-size:1.05rem;font-weight:700;margin-bottom:8px;">Aucune faction pour le moment</p>
+                        <p style="color:#b8c4e0;font-size:.92rem;">Créez une faction en jeu avec <code>/f create &lt;nom&gt;</code>, puis terminez des quêtes de guerre ⚔ pour remplir votre pass commun !</p>
+                    </div>`;
+                return;
+            }
+
+            if (!fpSelectedId || !factions.some(f => f.id === fpSelectedId)) {
+                fpSelectedId = factions[0].id;
+            }
+            const f = factions.find(x => x.id === fpSelectedId);
+            const stars = f.stars || 0;
+            const tier = f.tier || 0;
+            const maxTier = factionTiersData.length;
+            const finished = tier >= maxTier;
+            const need = Math.max(0, (tier + 1) * FACTION_PASS_TIER_COST - stars);
+
+            // Sélecteur de factions (classées par étoiles)
+            const selector = factions.map((x, i) => `
+                <button class="mv-player ${x.id === fpSelectedId ? 'active' : ''}" onclick="fpSelect('${x.id.replace(/'/g, "\\'")}')">
+                    ${i === 0 ? '👑 ' : ''}${x.id} <span>${(x.stars || 0)}⭐</span>
+                </button>`).join('');
+
+            const track = factionTiersData.map(t => {
+                const unlocked = t.tier <= tier;
+                const isNext = t.tier === tier + 1;
+                const icon = `${PASS_ICON_BASE}${t.icon}.png`;
+                const countBadge = t.count > 1 ? `<span class="mv-count">x${t.count}</span>` : '';
+                const extraBadge = t.extra > 0 ? `<span class="mv-extra">+${t.extra}</span>` : '';
+                return `
+                    <div class="mv-node ${unlocked ? 'unlocked' : ''} ${isNext ? 'next' : ''}">
+                        <div class="mv-icon">
+                            <img src="${icon}" alt="" loading="lazy" onerror="this.style.display='none'">
+                            ${countBadge}${extraBadge}
+                        </div>
+                        <div class="mv-reward">${t.label}</div>
+                        <div class="mv-money">+ ${t.money} €/membre</div>
+                        <div class="mv-badge">${unlocked ? '✔' : t.tier}</div>
+                        <div class="mv-cost">${t.tier * FACTION_PASS_TIER_COST}⭐</div>
+                    </div>`;
+            }).join('');
+
+            container.innerHTML = `
+                <div class="mv-wrap">
+                    <div class="mv-top">
+                        <div class="mv-title">🏴 Pass de Faction — ${f.id}</div>
+                        <div class="mv-top-stars">${stars} <b>⭐ communes</b></div>
+                    </div>
+                    <div class="mv-players">${selector}</div>
+                    <div class="mv-rewards-head">
+                        ${finished ? '🏆 Pass de faction terminé — trésor de guerre débloqué !'
+                                   : `Palier ${tier}/${maxTier} · <b>${need}⭐ communes</b> pour le palier ${tier + 1}`}
+                    </div>
+                    <div class="mv-track-wrap"><div class="mv-track">${track}</div></div>
+                </div>`;
+
+            requestAnimationFrame(() => {
+                const el = container.querySelector('.mv-node.next');
+                if (el) el.scrollIntoView({ inline: 'center', block: 'nearest' });
+            });
+        }
+
+        // ===== Gros classement des factions =====
+        let frSortKey = 'power'; // power | land | stars | members
+        const FR_SORTS = [
+            { key: 'power',   label: '⚡ Puissance' },
+            { key: 'land',    label: '🗺️ Territoires' },
+            { key: 'stars',   label: '⭐ Étoiles' },
+            { key: 'members', label: '👥 Membres' }
+        ];
+        window.frSort = function (key) { frSortKey = key; renderFactionRank(); };
+
+        function renderFactionRank() {
+            const container = document.getElementById('factionRankContent');
+            const sortBar = document.getElementById('frSort');
+            if (!container) return;
+
+            sortBar.innerHTML = FR_SORTS.map(s =>
+                `<button class="fr-sort-btn ${s.key === frSortKey ? 'active' : ''}" onclick="frSort('${s.key}')">${s.label}</button>`
+            ).join('');
+
+            if (!factions.length) {
+                container.innerHTML = `
+                    <div class="fr-empty">
+                        <div style="font-size:2.4rem;margin-bottom:10px;">🏴</div>
+                        <p style="color:#e6ecff;font-weight:700;margin-bottom:6px;">Aucune faction sur le serveur</p>
+                        <p style="color:#b8c4e0;font-size:.9rem;">Créez-en une en jeu avec <code>/f create &lt;nom&gt;</code> pour entrer dans la course à la domination !</p>
+                    </div>`;
+                return;
+            }
+
+            const val = (f, k) => k === 'stars' ? (f.stars || 0) : (f[k] != null ? f[k] : -1);
+            const sorted = [...factions].sort((a, b) => val(b, frSortKey) - val(a, frSortKey));
+            const medals = ['🥇', '🥈', '🥉'];
+            const fmt = (v) => v == null ? '—' : v;
+
+            const rows = sorted.map((f, i) => {
+                const rank = i + 1;
+                const badge = medals[i] || `<span class="fr-rank-num">${rank}</span>`;
+                const stat = (icon, v, key) => `
+                    <div class="fr-stat ${key === frSortKey ? 'hot' : ''}">
+                        <span class="fr-stat-ic">${icon}</span>
+                        <span class="fr-stat-v">${fmt(key === 'stars' ? (f.stars || 0) : f[key])}</span>
+                    </div>`;
+                return `
+                    <div class="fr-card ${rank <= 3 ? 'top' + rank : ''}">
+                        <div class="fr-badge">${badge}</div>
+                        <div class="fr-main">
+                            <div class="fr-name">🏴 ${f.id}</div>
+                            <div class="fr-sub">Palier ${f.tier || 0} du pass de faction</div>
+                        </div>
+                        <div class="fr-stats">
+                            ${stat('⚡', f.power, 'power')}
+                            ${stat('🗺️', f.land, 'land')}
+                            ${stat('👥', f.members, 'members')}
+                            ${stat('⭐', f.stars, 'stars')}
+                        </div>
+                    </div>`;
+            }).join('');
+
+            container.innerHTML = `<div class="fr-list">${rows}</div>`;
         }
 
         // Afficher l'historique
@@ -1170,6 +1372,7 @@
             await ensurePlayersExist();
             listenPlayers();
             listenHistory();
+            listenFactions();
         })();
     </script>
 </body>
