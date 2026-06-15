@@ -263,6 +263,18 @@
         .difficulty.hard { background: #ff6b6b; color: #1a1a2e; }
         .difficulty.extreme { background: #9b59b6; color: white; }
 
+        .cat-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            margin-left: 6px;
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+        }
+
         .achievement-title {
             font-size: 1.3rem;
             margin-bottom: 8px;
@@ -746,6 +758,15 @@
                 <button class="filter-btn" data-filter="extreme">Extrême</button>
                 <button class="filter-btn" data-filter="incomplete">Non complétés</button>
             </div>
+            <div class="filter-bar" style="margin-top:8px;">
+                <button class="filter-btn" data-filter="cat:combat">⚔️ Combat & PvP</button>
+                <button class="filter-btn" data-filter="cat:minage">⛏️ Minage</button>
+                <button class="filter-btn" data-filter="cat:metier">🌾 Métiers</button>
+                <button class="filter-btn" data-filter="cat:construction">🏗️ Construction</button>
+                <button class="filter-btn" data-filter="cat:magie">🧪 Magie</button>
+                <button class="filter-btn" data-filter="cat:aventure">🧭 Aventure</button>
+                <button class="filter-btn" data-filter="cat:prestige">🏅 Prestige</button>
+            </div>
             <div class="achievements-grid" id="achievementsGrid"></div>
         </section>
 
@@ -1002,6 +1023,9 @@
             if (currentFilter !== 'all') {
                 if (currentFilter === 'incomplete') {
                     filtered = achievements.filter(a => !myIds.includes(a.id));
+                } else if (currentFilter.startsWith('cat:')) {
+                    const catKey = currentFilter.slice(4);
+                    filtered = achievements.filter(a => a.cat === catKey);
                 } else {
                     filtered = achievements.filter(a => a.difficulty === currentFilter);
                 }
@@ -1017,6 +1041,10 @@
                               achievement.difficulty === 'medium' ? 'Moyen' :
                               achievement.difficulty === 'hard' ? 'Difficile' : 'Extrême'}
                         </span>
+                        ${achievement.cat && categories[achievement.cat] ? `
+                        <span class="cat-badge" style="background:${categories[achievement.cat].color};">
+                            ${categories[achievement.cat].icon} ${categories[achievement.cat].label}
+                        </span>` : ''}
                         <h3 class="achievement-title">${achievement.title}</h3>
                         <p class="achievement-desc">${achievement.desc}</p>
                         <div class="reward-box">
