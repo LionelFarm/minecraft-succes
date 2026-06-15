@@ -829,7 +829,7 @@
         const auth = getAuth(app);
 
         // ===== Authentification admin =====
-        const ADMIN_UID = "drAGht17j8XgLjQq07tgtl6hdky1";
+        const ADMIN_UID = "aHfaopMaGFVnAa9ECs3wGsJV1fp2";
         let isAdmin = false;
         onAuthStateChanged(auth, (user) => {
             isAdmin = !!user && user.uid === ADMIN_UID;
@@ -859,7 +859,8 @@
                 document.getElementById('loginPassword').value = '';
                 showNotification('🔓 Connecté en tant qu\'admin !');
             } catch (e) {
-                errEl.textContent = 'Email ou mot de passe incorrect.';
+                errEl.textContent = 'Erreur : ' + (e.code || e.message);
+                console.error('Login error:', e);
             }
         };
         window.adminLogout = async function () {
