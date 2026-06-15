@@ -595,6 +595,20 @@
         .ach-count { color: var(--text-muted); font-size: .95rem; margin-bottom: 18px; }
         .ach-count b { color: var(--text, #e8edf5); }
 
+        /* ===== Zone admin / connexion ===== */
+        .admin-bar { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+        .admin-status { font-size: .85rem; color: var(--text-muted); }
+        body.is-admin .admin-status { color: #4ade80; font-weight: 700; }
+        .admin-btn { padding: 7px 14px; border-radius: 9px; border: 1px solid rgba(255,255,255,.16);
+            background: rgba(255,255,255,.06); color: #dfe4ff; cursor: pointer; font-weight: 600; font-size: .85rem; transition: .15s; }
+        .admin-btn:hover { border-color: #ffd23f; color: #fff; }
+        .login-box { display: flex; gap: 8px; justify-content: center; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+        .login-box input { padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.16);
+            background: rgba(0,0,0,.25); color: #fff; font-size: .9rem; }
+        .login-error { color: #ff6b6b; font-size: .82rem; }
+        /* Masque toutes les actions admin pour les visiteurs (non connectés) */
+        body:not(.is-admin) .admin-only { display: none !important; }
+
         /* ===== Gros classement des factions ===== */
         .fr-sort { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
         .fr-sort-btn { padding: 8px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,.14);
@@ -689,6 +703,19 @@
             <h1>⚔️ Succès Minecraft</h1>
             <p class="subtitle">Survie Difficile — 5 Joueurs</p>
             <p class="connection-status offline" id="connectionStatus">Connexion à la base de données...</p>
+
+            <!-- Zone admin (connexion) -->
+            <div class="admin-bar">
+                <span id="adminStatus" class="admin-status">👁️ Mode visiteur (lecture seule)</span>
+                <button id="adminToggleBtn" class="admin-btn" onclick="toggleLoginBox()">🔒 Connexion admin</button>
+                <button id="adminLogoutBtn" class="admin-btn" style="display:none;" onclick="adminLogout()">🚪 Déconnexion</button>
+            </div>
+            <div class="login-box" id="loginBox" style="display:none;">
+                <input type="email" id="loginEmail" placeholder="Email" autocomplete="username">
+                <input type="password" id="loginPassword" placeholder="Mot de passe" autocomplete="current-password">
+                <button class="admin-btn" onclick="adminLogin()">Se connecter</button>
+                <span id="loginError" class="login-error"></span>
+            </div>
         </header>
 
         <nav class="tabs">
@@ -758,7 +785,7 @@
             </div>
         </section>
 
-        <div class="reset-section">
+        <div class="reset-section admin-only">
             <button class="reset-btn" onclick="resetAll()">🔄 Réinitialiser tout</button>
         </div>
     </div>
@@ -792,10 +819,53 @@
             onSnapshot, getDocs, arrayUnion, increment, serverTimestamp,
             query, orderBy, limit, writeBatch
         } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import {
+            getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { firebaseConfig } from "./firebase-config.js";
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // ===== Authentification admin =====
+        const ADMIN_UID = "drAGht17j8XgLjQq07tgtl6hdky1";
+        let isAdmin = false;
+        onAuthStateChanged(auth, (user) => {
+            isAdmin = !!user && user.uid === ADMIN_UID;
+            document.body.classList.toggle('is-admin', isAdmin);
+            const statusEl2 = document.getElementById('adminStatus');
+            document.getElementById('adminToggleBtn').style.display = isAdmin ? 'none' : '';
+            document.getElementById('adminLogoutBtn').style.display = isAdmin ? '' : 'none';
+            document.getElementById('loginBox').style.display = 'none';
+            if (statusEl2) statusEl2.textContent = isAdmin
+                ? '✅ Admin connecté — tu peux tout modifier'
+                : '👁️ Mode visiteur (lecture seule)';
+            // Re-rend pour afficher/masquer les actions admin
+            if (typeof renderAchievements === 'function') renderAchievements();
+        });
+
+        window.toggleLoginBox = function () {
+            const box = document.getElementById('loginBox');
+            box.style.display = box.style.display === 'none' ? 'flex' : 'none';
+        };
+        window.adminLogin = async function () {
+            const email = document.getElementById('loginEmail').value.trim();
+            const pass = document.getElementById('loginPassword').value;
+            const errEl = document.getElementById('loginError');
+            errEl.textContent = '';
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+                document.getElementById('loginPassword').value = '';
+                showNotification('🔓 Connecté en tant qu\'admin !');
+            } catch (e) {
+                errEl.textContent = 'Email ou mot de passe incorrect.';
+            }
+        };
+        window.adminLogout = async function () {
+            await signOut(auth);
+            showNotification('🔒 Déconnecté (mode visiteur)');
+        };
 
         const playersCol = collection(db, "players");
         const historyCol = collection(db, "history");
@@ -1296,6 +1366,7 @@
 
         // Modal
         window.openModal = function(achievementId) {
+            if (!isAdmin) { showNotification('🔒 Réservé à l\'admin — connecte-toi.', true); return; }
             currentAchievementId = achievementId;
             const achievement = achievements.find(a => a.id === achievementId);
 
@@ -1315,6 +1386,7 @@
         }
 
         window.confirmComplete = async function() {
+            if (!isAdmin) { showNotification('🔒 Réservé à l\'admin.', true); return; }
             const playerId = document.getElementById('playerSelect').value;
             const player = players.find(p => p.id === playerId);
             const achievement = achievements.find(a => a.id === currentAchievementId);
@@ -1374,6 +1446,7 @@
         }
 
         window.resetAll = async function() {
+            if (!isAdmin) { showNotification('🔒 Réservé à l\'admin.', true); return; }
             if (!confirm('⚠️ Voulez-vous vraiment réinitialiser toutes les données (points, succès, historique) pour TOUT LE MONDE ?')) {
                 return;
             }
@@ -1415,7 +1488,9 @@
 
         // Initialisation
         (async function init() {
-            await ensurePlayersExist();
+            // L'écriture des joueurs par défaut est réservée à l'admin (règles
+            // Firestore). On l'enveloppe pour qu'un refus ne bloque pas l'affichage.
+            try { await ensurePlayersExist(); } catch (e) { console.warn('ensurePlayersExist ignoré:', e.message); }
             listenPlayers();
             listenHistory();
             listenFactions();
