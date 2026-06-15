@@ -9,7 +9,7 @@
 // ====================================================================
 
 export const firebaseConfig = {
-  apiKey: "AIzaSyDKQ9wLNqMlNJo3UiZpOP5Ijx-IUf5KIqg",
+  apiKey: "AIzaSyDKQ9wlNqMlNJo3UiZpOP5Ijx-IUf5KIqg",
   authDomain: "minecraft-succes.firebaseapp.com",
   projectId: "minecraft-succes",
   storageBucket: "minecraft-succes.firebasestorage.app",
